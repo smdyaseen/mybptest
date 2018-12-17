@@ -14,7 +14,7 @@ Vagrantfile - Sets up vagrant box with CentOS provisioned with Ansible
 	playbook_nginx.yml
 		- Setup Container with customized content and build the image to use for micro service setup
 	playbook_microservice.yml
-		- Uses Dockerfile/docker-compose.yml to create an container and runs as micro service
+		- Uses Dockerfile/docker-compose.yml to create an container and runs as micro service using shell script "start-nginx-microservice"
 		
 Task "Docker Compose Micro Service Build" calls Dockerfile to build container from image and runs docker-compose to bring Nginx Service up as micro service.
 
