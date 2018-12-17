@@ -1,68 +1,31 @@
 ---
 - hosts: all
+  gather_facts: false
   become: yes
   become_method: sudo
   tasks:
-    - name: Docker Install
-      yum: name=docker state=latest
-    - name: Docker Enable
+    - name: Docker Pre-Requisites                      ## Pre-Requisites for Docker ##
+      yum:
+        name: "{{ item }}"
+        state: latest
+      with_items:
+      - python-docker-py
+      - python-py
+      - python
+      - docker
+    - name: Docker Enable Start Service                ## Enabling/Starting Docker Service
       systemd:
         name: docker
         enabled: yes
-        masked: no
-    - name: Docker Start
-      systemd:
-        name: docker
         state: started
         masked: no
-    - name: Vagrant Docker Permission
+    - name: Vagrant Docker Permission                  ## Assigning Suffiient Permissions to Vagrant User
       user:
         name: vagrant
         groups: dockerroot,root
         append: yes
-    - name: Docker Container Prereqs
-      yum: name=python-docker-py state=latest
-    - name: Docker Container Prereqs1
-      yum: name=python-py state=latest
-    - name: Docker Container Prereqs2
-      yum: name=python state=latest
-    - name: "Create file"
+    - name: "Create Hello World Templace File"         ## Template for Nginx Display Content 
       template:
         src: index.j2
         dest: /tmp/index.html
         mode: 0777
-    - name: Create Container
-      docker_container:
-        name: mybptest
-        image: nginx:alpine
-        state: started
-        recreate: yes
-        ports:
-          - "8080:80"
-        privileged: yes
-        restart: yes
-    - name: Update Container
-      command: docker cp /tmp/index.html mybptest:/usr/share/nginx/html/index.html
-    - name: Restart Container
-      command: docker restart mybptest
-    - name: Add Container Inventory
-      add_host:
-        hostname: mybptest
-        ansible_connection: docker
-        ansible_python_interpreter: /usr/bin/python3
-    - name: Stop Container
-      shell: docker container stop mybptest
-    - name: Commit Container
-      shell: docker commit mybptest bptest:v1
-    - name: Install dockercompose
-      command: curl -L https://github.com/docker/compose/releases/download/1.23.0/docker-compose-Linux-x86_64 -o /usr/local/bin/docker-compose
-    - name: Permit Compose
-      command: chmod 755 /usr/local/bin/docker-compose
-    - name: Docker Compose
-      command: /vagrant/nginxcon/start-nginx-microservice
-  #      files: /vagrant/nginxcon/docker-compose.yml
-  #      project_src: /vagrant/nginxcon/docker-compose.yml
-  #      project_name: "bptest"
-  #      pull: true
-  #      state: present
-  #      restarted: true

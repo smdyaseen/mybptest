@@ -15,7 +15,14 @@ Vagrant.configure(2) do |config|
   end
   config.vm.provision "ansible" do |ansible|
     ansible.playbook = "playbook_docker.yml"
-#    ansible.playbook = "playbook_nginx.yml"
+    ansible.verbose = "v"
+  end
+  config.vm.provision "ansible" do |ansible|
+    ansible.playbook = "playbook_nginx.yml"
+    ansible.verbose = "v"
+  end
+  config.vm.provision "ansible" do |ansible|
+    ansible.playbook = "playbook_microservice.yml"
     ansible.verbose = "v"
   end
 end

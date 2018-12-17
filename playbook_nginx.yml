@@ -1,0 +1,34 @@
+---
+- hosts: all
+  gather_facts: false
+  become: yes
+  become_method: sudo
+  vars:
+    base_image: nginx:alpine
+    base_container: mybptest
+  tasks:
+    - name: Create Nginx Container                     ## Preparing a container for Nginx Micro Service
+      docker_container:
+        name: '{{ base_container }}'
+        image: '{{ base_image }}'
+        state: started
+        recreate: yes
+        ports:
+          - "8080:80"
+        privileged: yes
+        restart: yes
+    - name: Update Nginx Container Hello World         ## Updating Nginx Content to display "Hello World"
+      command: docker cp /tmp/index.html '{{ base_container }}':/usr/share/nginx/html/index.html
+    - name: Restart Container
+      command: docker restart '{{ base_container }}'
+    - name: Add Container Inventory
+      add_host:
+        hostname: '{{ base_container }}'
+        ansible_connection: docker
+        ansible_python_interpreter: /usr/bin/python3
+    - name: Stop Nginx Container
+      shell: docker container stop '{{ base_container }}'
+    - name: Commit Nginx Container                     ## Customized Nginx Container for Micro Service Setup
+      shell: docker commit '{{ base_container }}' bptest:v1
+    - name: Remove Container
+      shell: docker rm '{{ base_container }}'
