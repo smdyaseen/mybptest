@@ -19,3 +19,5 @@ Vagrantfile - Sets up vagrant box with CentOS provisioned with Ansible
 Task "Docker Compose Micro Service Build" calls Dockerfile to build container from image and runs docker-compose to bring Nginx Service up as micro service.
 
 To test the nginx setup, access the page at port 8080.
+
+test_deploy.sh bash script to the nginx host and service status
