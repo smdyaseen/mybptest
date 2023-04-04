@@ -26,3 +26,5 @@ fi
 }
 checkHostStatus
 checkNginxHealthCheck
+
+echo "Hello"
